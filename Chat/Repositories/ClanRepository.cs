@@ -57,5 +57,18 @@ public class ClanRepository : IClanRepository
     public async Task AddAsync(Clan item)
     {
         await _dbSet.AddAsync(item);
+        await SaveAsync();
+    }
+
+    public bool Exists(string name)
+    {
+        var result = _dbSet.Any(x => x.Name == name);
+
+        return result;
+    }
+
+    public async Task SaveAsync()
+    {
+        await _appDataContext.SaveChangesAsync();
     }
 }

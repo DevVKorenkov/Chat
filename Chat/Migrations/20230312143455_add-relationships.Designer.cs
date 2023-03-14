@@ -4,6 +4,7 @@ using Chat.DataContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chat.Migrations
 {
     [DbContext(typeof(AppDataContext))]
-    partial class AppDataContextModelSnapshot : ModelSnapshot
+    [Migration("20230312143455_add-relationships")]
+    partial class addrelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,16 +252,15 @@ namespace Chat.Migrations
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
-                    b.Property<int>("Index")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Index"));
-
                     b.Property<int?>("UserClanId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserClanId1")
+                        .HasColumnType("int");
+
                     b.HasIndex("UserClanId");
+
+                    b.HasIndex("UserClanId1");
 
                     b.HasDiscriminator().HasValue("AppIdentityUser");
                 });
@@ -316,9 +318,13 @@ namespace Chat.Migrations
 
             modelBuilder.Entity("Chat.Models.AppIdentityUser", b =>
                 {
-                    b.HasOne("Chat.Models.Clan", "UserClan")
+                    b.HasOne("Chat.Models.Clan", null)
                         .WithMany("ClanMembers")
                         .HasForeignKey("UserClanId");
+
+                    b.HasOne("Chat.Models.Clan", "UserClan")
+                        .WithMany()
+                        .HasForeignKey("UserClanId1");
 
                     b.Navigation("UserClan");
                 });

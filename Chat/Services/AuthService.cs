@@ -1,6 +1,8 @@
 ﻿using Chat.Config;
 using Chat.DTOs;
+using Chat.Helpers;
 using Chat.Models;
+using Chat.Models.Responses;
 using Chat.Services.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -34,33 +36,28 @@ public class AuthService : IAuthService
         {
             return new AuthResponse
             {
-                Response = Responses.NotFound,
+                Response = ResponseStatus.NotFound,
                 Message = "User not found."
             };
         }
 
-        var result = await _signInManager.PasswordSignInAsync(loginModel.Name, loginModel.Password, false, false);
+        var loginResult = await _signInManager.PasswordSignInAsync(loginModel.Name, loginModel.Password, false, false);
 
-        if (result.Succeeded)
+        if (loginResult.Succeeded)
         {
             var jwtToken = await CreateJwtToken(user);
             return new AuthResponse
             {
-                Response = Responses.Success,
+                Response = ResponseStatus.Success,
                 Message = "You have successfully logged in",
                 Token = jwtToken,
-                User = new UserDTO 
-                { 
-                    Id = user.Id,
-                    Name = user.UserName,
-                },
+                User = UserHelper.GetUserDto(user),
             };
         }
         else
         {
             return new AuthResponse
             {
-                Response = Responses.Unauthorized,
                 Message = "Login or password is incorrect"
             };
         }
@@ -72,21 +69,20 @@ public class AuthService : IAuthService
 
         return new AuthResponse
         {
-            Response = Responses.Success,
+            Response = ResponseStatus.Success,
             Message = "You have successfully logged out"
         };
     }
 
     public async Task<AuthResponse> Signup(SignupModel signupModel)
     {
-        AuthResponse response = null;
         var checkName = await _userManager.FindByNameAsync(signupModel.Name);
 
         if(checkName != null)
         {
             return new AuthResponse
             {
-                Response = Responses.BadReques,
+                Response = ResponseStatus.BadReques,
                 Message = "There is another user with the same name, please make different name."
             };
         }
@@ -100,27 +96,32 @@ public class AuthService : IAuthService
 
         if (registerResult.Succeeded)
         {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName),
+            };
+
+            await _userManager.AddClaimsAsync(user, claims);
+
             await _userService.SaveAsync();
+
             await _signInManager.SignInAsync(user, isPersistent: false);
             var jwtToken = await CreateJwtToken(user);
 
             return new AuthResponse
             {
-                Response = Responses.Success,
+                Response = ResponseStatus.Success,
                 Message = "User has been created successfuly",
                 Token = jwtToken,
-                User = new UserDTO
-                {
-                    Id = user.Id,
-                    Name = user.UserName
-                }
+                User = UserHelper.GetUserDto(user),
             };
         }
         else
         {
             return new AuthResponse
             {
-                Response = Responses.BadReques,
+                Response = ResponseStatus.BadReques,
                 Message = registerResult.Errors?.FirstOrDefault()?.Description
             };
         }
@@ -128,13 +129,17 @@ public class AuthService : IAuthService
 
     private async Task<string> CreateJwtToken(AppIdentityUser user)
     {
-        var roles = await _userManager.GetRolesAsync(user);
-        var rolesString = string.Join(',', roles);
+        var claims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Name, user.UserName),
+        };
         var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SettingsManager.AppSettings["JWT:Secret"]));
         var credentials = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         var tokenOptions = new JwtSecurityToken(
             issuer: SettingsManager.AppSettings["Jwt:ValidIssuer"],
             audience: SettingsManager.AppSettings["Jwt:ValidAudience"],
+            claims: claims,
             expires: DateTime.Now.AddDays(1),
             signingCredentials: credentials);
         var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();

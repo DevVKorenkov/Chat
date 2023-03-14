@@ -5,7 +5,10 @@ namespace Chat.Models;
 
 public class AppIdentityUser : IdentityUser
 {
+    public int Index { get; set; }
+
     public int? UserClanId { get; set; }
+
     [ForeignKey("UserClanId")]
     public Clan? UserClan { get; set; }
 }

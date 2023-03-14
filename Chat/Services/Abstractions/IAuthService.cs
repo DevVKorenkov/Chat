@@ -1,4 +1,5 @@
 ﻿using Chat.Models;
+using Chat.Models.Responses;
 
 namespace Chat.Services.Abstractions;
 

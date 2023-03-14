@@ -1,4 +1,5 @@
-﻿using Chat.Models;
+﻿using Chat.DTOs;
+using Chat.Models;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
@@ -7,6 +8,7 @@ namespace Chat.Repositories.Abstraction;
 public interface IUserRepository
 {
     Task<IEnumerable<AppIdentityUser>> GetAllAsync(
+        Expression<Func<AppIdentityUser, bool>> filter = null,
         Func<IQueryable<AppIdentityUser>, 
             IIncludableQueryable<AppIdentityUser, object>> includes = null);
 

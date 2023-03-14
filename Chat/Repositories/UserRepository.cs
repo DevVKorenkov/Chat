@@ -1,8 +1,10 @@
 ﻿using Chat.DataContext;
+using Chat.DTOs;
 using Chat.Models;
 using Chat.Repositories.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Caching.Memory;
 using System.Linq.Expressions;
 
 namespace Chat.Repositories;
@@ -11,14 +13,17 @@ public class UserRepository : IUserRepository
 {
     private readonly AppDataContext _appDataContext;
     private readonly DbSet<AppIdentityUser> _dbSet;
+    private readonly IMemoryCache _memoryCache;
 
-    public UserRepository(AppDataContext appDataContext)
+    public UserRepository(AppDataContext appDataContext, IMemoryCache memoryCache)
     {
         _appDataContext = appDataContext;
         _dbSet = _appDataContext.Set<AppIdentityUser>();
+        _memoryCache = memoryCache;
     }
 
     public async Task<IEnumerable<AppIdentityUser>> GetAllAsync(
+        Expression<Func<AppIdentityUser, bool>> filter = null,
         Func<IQueryable<AppIdentityUser>, IIncludableQueryable<AppIdentityUser, object>> includes = null)
     {
         IQueryable<AppIdentityUser> query = _dbSet;
@@ -26,6 +31,11 @@ public class UserRepository : IUserRepository
         if(includes != null)
         {
             query = includes(query);
+        }
+
+        if(filter != null)
+        {
+            query = query.Where(filter);
         }
 
         var users = await query.ToListAsync();

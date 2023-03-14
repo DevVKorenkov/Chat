@@ -19,10 +19,10 @@ public class UserService : IUserService
         _clanRepository = clanRepository;
     }
 
-    public Task<IEnumerable<AppIdentityUser>> GetAllAsync()
+    public async Task<IEnumerable<AppIdentityUser>> GetAllAsync(Expression<Func<AppIdentityUser, bool>> filter = null)
     {
-        var users = _userRepository.GetAllAsync(
-            x => x.Include(c => c.UserClan));
+        var users = await _userRepository.GetAllAsync(filter,
+            includes: x => x.Include(u => u.UserClan));
 
         return users;
     }
@@ -31,7 +31,7 @@ public class UserService : IUserService
     {
         var user = _userRepository.GetAsync(
             filter, 
-            includes: x => x.Include(c => c.UserClan));
+            includes: x => x.Include(u => u.UserClan));
 
         return user;
     }
@@ -40,8 +40,7 @@ public class UserService : IUserService
     {
         var clan = await _clanRepository.GetAsync(
             c => c.Name == clanName,
-            includes: x => x.Include(c => c.ClanMembers)
-            .ThenInclude(u => u.UserClan));
+            includes: x => x.Include(c => c.ClanMembers));
 
         await _userRepository.SetClan(userId, clan);
     }

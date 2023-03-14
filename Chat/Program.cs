@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,8 @@ services.AddSwaggerGen(c =>
 
 services.AddSignalR();
 services.AddControllers();
+services.AddMemoryCache();
+
 services.AddHttpContextAccessor();
 services.AddCors(opt =>
 {
@@ -91,6 +94,7 @@ services.AddScoped<IClanRepository, ClanRepository>();
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<IClanService, ClanService>();
 services.AddTransient<IAuthService, AuthService>();
+services.AddSingleton<IDictionary<string, UserConnection>>();
 
 var app = builder.Build();
 

@@ -2,7 +2,6 @@
 using Chat.Repositories.Abstraction;
 using Chat.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace Chat.Services;
@@ -21,20 +20,22 @@ public class ClanService : IClanService
         await _clanRepository.AddAsync(item);
     }
 
+    public bool Exists(string name) => _clanRepository.Exists(name);
+
     public async Task<IEnumerable<Clan>> GetAllAsync()
     {
         var clans = await _clanRepository.GetAllAsync(
-            x => x.Include(c => c.ClanMembers)
-            .ThenInclude(u => u.UserClan));
+            x => x.Include(c => c.ClanMembers));
 
         return clans;
     }
 
     public async Task<Clan> GetAsync(
-        Expression<Func<Clan, bool>> filter = null, 
-        Func<IQueryable<Clan>, IIncludableQueryable<Clan, object>> includes = null)
+        Expression<Func<Clan, bool>> filter = null)
     {
-        var clan = await _clanRepository.GetAsync(filter, includes);
+        var clan = await _clanRepository.GetAsync(
+            filter,
+            includes: x => x.Include(c => c.ClanMembers));
 
         return clan;
     }

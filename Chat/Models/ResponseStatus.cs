@@ -1,6 +1,6 @@
 ﻿namespace Chat.Models;
 
-public enum Responses
+public enum ResponseStatus
 {
     Success,
     Unauthorized,

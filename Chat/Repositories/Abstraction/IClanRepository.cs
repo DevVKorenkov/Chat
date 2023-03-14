@@ -11,4 +11,6 @@ public interface IClanRepository
         Expression<Func<Clan, bool>> filter = null, 
         Func<IQueryable<Clan>, IIncludableQueryable<Clan, object>> includes = null);
     Task AddAsync(Clan item);
+    bool Exists(string name);
+    Task SaveAsync();
 }

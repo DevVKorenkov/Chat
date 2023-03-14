@@ -5,7 +5,7 @@ namespace Chat.Services.Abstractions;
 
 public interface IUserService
 {
-    Task<IEnumerable<AppIdentityUser>> GetAllAsync();
+    Task<IEnumerable<AppIdentityUser>> GetAllAsync(Expression<Func<AppIdentityUser, bool>> filter = null);
 
     Task<AppIdentityUser> GetAsync(
         Expression<Func<AppIdentityUser, bool>> filter = null);

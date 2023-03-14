@@ -18,19 +18,22 @@ public class AuthController : Controller
     [HttpPost, Route("signup")]
     public async Task<IActionResult> SignUp(SignupModel signupModel)
     {
-        ObjectResult response = null;
+        ObjectResult response;
 
         var signupResult = await _authService.Signup(signupModel);
 
         switch (signupResult.Response)
         {
-            case Responses.Success:
+            case ResponseStatus.Success:
                 response = Ok(signupResult);
                 break;
-            case Responses.NotFound:
+            case ResponseStatus.NotFound:
                 response = NotFound(signupResult);
                 break;
-            case Responses.BadReques:
+            case ResponseStatus.BadReques:
+                response = BadRequest(signupResult);
+                break;
+            default:
                 response = BadRequest(signupResult);
                 break;
         }
@@ -39,14 +42,36 @@ public class AuthController : Controller
     }
 
     [HttpPost, Route("login")]
-    public async Task<IActionResult> Login(SignupModel signupModel)
+    public async Task<IActionResult> Login(LoginModel loginModel)
     {
-        return Ok();
+        ObjectResult response;
+
+        var loginResponse = await _authService.Login(loginModel);
+
+        switch (loginResponse.Response)
+        {
+            case ResponseStatus.Success:
+                response = Ok(loginResponse);
+                break;
+            case ResponseStatus.NotFound:
+                response = NotFound(loginResponse);
+                break;
+            case ResponseStatus.BadReques:
+                response = BadRequest(loginResponse);
+                break;
+            default:
+                response = BadRequest(loginResponse);
+                break;
+        }
+
+        return response;
     }
 
     [HttpPost, Route("logout")]
-    public async Task<IActionResult> Logout(SignupModel signupModel)
+    public async Task<IActionResult> Logout()
     {
-        return Ok();
+        var loginResponse = await _authService.Logout();
+
+        return Ok(loginResponse);
     }
 }

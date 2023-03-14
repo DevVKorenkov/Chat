@@ -3,5 +3,6 @@
 public class UserConnection
 {
     public string Name { get; set; }
-    public string ClanRoom { get; set; }
+
+    public string Room { get; set; }
 }
