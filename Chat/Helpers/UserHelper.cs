@@ -5,6 +5,11 @@ namespace Chat.Helpers;
 
 public class UserHelper
 {
+    /// <summary>
+    /// Transforms application user identity entity to user data transfer object
+    /// </summary>
+    /// <param name="appUser"></param>
+    /// <returns></returns>
     public static UserDTO GetUserDto(AppIdentityUser appUser)
     {
         var user = new UserDTO 
@@ -17,6 +22,11 @@ public class UserHelper
         return user;
     }
 
+    /// <summary>
+    /// Transforms a bunch of user identity entitys to a bunch of user data transfer objects
+    /// </summary>
+    /// <param name="appUsers"></param>
+    /// <returns></returns>
     public static IEnumerable<UserDTO> GetUserDtos(IEnumerable<AppIdentityUser> appUsers)
     {
         var users = appUsers.Select(u =>

@@ -68,7 +68,7 @@ public class UserController : Controller
 
         if (!appUsers.Any())
         {
-            return NotFound(new
+            return Ok(new
             {
                 Message = "Users or clan haven't been found",
             });

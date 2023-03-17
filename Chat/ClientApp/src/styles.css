@@ -1,6 +1,9 @@
-/* You can add global styles to this file, and also import other style files */
-
-/* Provide sufficient contrast against white background */
+.background{
+  background-color: #1d1d1d;
+}
+html{
+  background-color: #1d1d1d;
+}
 a {
   color: #0366d6;
 }

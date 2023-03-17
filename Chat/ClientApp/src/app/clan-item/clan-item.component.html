@@ -1,0 +1,14 @@
+﻿<a class="text-light"
+   [routerLink]="[item.name]">
+  <div class="list-group-item bg-dark rounded-2 border-light">
+    <div class="row">
+      <div class="row-6">
+        <label class="text-light">Clan name: {{item.name}}</label>
+      </div>
+      <div class="row-3">
+        <label class="text-light">Do you want to enter to this clan?</label>
+        <a class="btn btn-primary ms-2" (click)="onApply()">Apply</a>
+      </div>
+    </div>
+  </div>
+</a>

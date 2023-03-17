@@ -1,5 +1,5 @@
-<body>
-  <app-nav-menu></app-nav-menu>
+<div *ngIf="isAuthenticated"></div>
+<body class="background">
   <main class="container">
     <router-outlet></router-outlet>
   </main>

@@ -2,6 +2,9 @@
 
 public class SettingsManager
 {
+    /// <summary>
+    /// Property to getting fields from appsettings.json
+    /// </summary>
     public static IConfiguration AppSettings { get; private set; }
 
     static SettingsManager()

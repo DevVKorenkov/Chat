@@ -30,7 +30,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> Login(LoginModel loginModel)
     {
-        var user = await _userManager.FindByNameAsync(loginModel.Name);
+        var user = await _userService.GetAsync(u => u.UserName == loginModel.Name);
 
         if (user == null)
         {
@@ -82,7 +82,7 @@ public class AuthService : IAuthService
         {
             return new AuthResponse
             {
-                Response = ResponseStatus.BadReques,
+                Response = ResponseStatus.BadRequest,
                 Message = "There is another user with the same name, please make different name."
             };
         }
@@ -121,7 +121,7 @@ public class AuthService : IAuthService
         {
             return new AuthResponse
             {
-                Response = ResponseStatus.BadReques,
+                Response = ResponseStatus.BadRequest,
                 Message = registerResult.Errors?.FirstOrDefault()?.Description
             };
         }

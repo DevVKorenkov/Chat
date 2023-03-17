@@ -9,11 +9,13 @@ using Chat.Services.Abstractions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
+using StackExchange.Redis;
 using System.Text;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,10 +57,12 @@ services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyHeader()
+        policy.SetIsOriginAllowedToAllowWildcardSubdomains()
+        .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
-        .SetIsOriginAllowed((host) => true);
+        .SetIsOriginAllowed((host) => true)
+        .Build();
     });
 });
 
@@ -93,8 +97,10 @@ services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<IClanRepository, ClanRepository>();
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<IClanService, ClanService>();
+services.AddScoped<IMessageCacheRepository, MessageCacheRepository>();
 services.AddTransient<IAuthService, AuthService>();
-services.AddSingleton<IDictionary<string, UserConnection>>();
+services.AddSingleton<IDictionary<string, UserConnection>>(opt => new Dictionary<string, UserConnection>());
+services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(SettingsManager.AppSettings["RedisConnection"]));
 
 var app = builder.Build();
 
@@ -109,18 +115,19 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "chat_v1");
 });
 
+app.UseCors();
+
 app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<ChatHub>("/chat");
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
 
 //app.MapFallbackToFile("index.html");
+app.MapHub<ChatHub>("/chat");
 
 app.Run();

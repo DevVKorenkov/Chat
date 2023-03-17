@@ -30,7 +30,7 @@ public class AuthController : Controller
             case ResponseStatus.NotFound:
                 response = NotFound(signupResult);
                 break;
-            case ResponseStatus.BadReques:
+            case ResponseStatus.BadRequest:
                 response = BadRequest(signupResult);
                 break;
             default:
@@ -56,7 +56,7 @@ public class AuthController : Controller
             case ResponseStatus.NotFound:
                 response = NotFound(loginResponse);
                 break;
-            case ResponseStatus.BadReques:
+            case ResponseStatus.BadRequest:
                 response = BadRequest(loginResponse);
                 break;
             default:
@@ -67,7 +67,7 @@ public class AuthController : Controller
         return response;
     }
 
-    [HttpPost, Route("logout")]
+    [HttpGet, Route("logout")]
     public async Task<IActionResult> Logout()
     {
         var loginResponse = await _authService.Logout();

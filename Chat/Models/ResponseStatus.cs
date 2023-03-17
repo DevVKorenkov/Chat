@@ -5,5 +5,5 @@ public enum ResponseStatus
     Success,
     Unauthorized,
     NotFound,
-    BadReques,
+    BadRequest,
 }

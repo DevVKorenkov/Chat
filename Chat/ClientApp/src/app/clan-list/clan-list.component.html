@@ -1,0 +1,27 @@
+<div class="row mt-3">
+  <div class="col-12">
+    <form
+    (ngSubmit)="onNewClan()"
+    [formGroup]="newClanGroup">
+      <label class="text-light" for="name">Clan name</label>
+      <input
+        id="name"
+        class="form-control bg-dark text-light"
+        type="text"
+        formControlName="name">
+      <button class="btn btn-primary" type="submit">Create new Clan</button>
+    </form>
+  </div>
+</div>
+<hr>
+<h3 *ngIf="!allClans">There are not any clans</h3>
+<div *ngIf="allClans">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 list-group">
+        <app-clan-item *ngFor="let c of allClans" [item]="c"></app-clan-item>
+      </div>
+    </div>
+  </div>
+</div>
+

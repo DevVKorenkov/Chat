@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-xxl navbar-dark bg-dark">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a href="#" class="navbar-brand ms-5">Clan Chats</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/chat', 'common']">To common chat</a>
+      </li>
+      <li class="nav-item" *ngIf="user?.user?.userClan">
+        <a class="nav-link" [routerLink]="['/chat', user?.user?.userClan?.name]">To clan chat</a>
+      </li>
+    </ul>
+    <div class="ms-auto me-5" *ngIf="!user">
+      <a
+        class="nav-link text-light"
+        style="cursor: pointer"
+        [routerLink]="['/auth']">
+        Authenticate
+      </a>
+    </div>
+    <div class="ms-auto me-5">
+      <a
+        style="cursor: pointer"
+        class="dropdown-item link-danger"
+        (click)="logout()">
+        Log out
+      </a>
+    </div>
+  </div>
+</nav>
+
