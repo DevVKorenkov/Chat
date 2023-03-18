@@ -14,7 +14,7 @@ The back-end is .net 7 and front-end is Angular 15 (I am still a bad front-end-d
 And, actually, I haven't resolved a couple problems with front-end. And here they are: 
 1. somehow, the redirection to home page doesn't work after authorization or registration. You shold write the url by your own hands or just delete 
    /auth from url and hit enter after one of these actions.
-2. Messages come instantly, but the view is slow. Sometimes is can take more than 15 seconds.)
+2. Messages come instantly (you can see it in browser developer console), but the view is slow. Sometimes is can take more than 15 seconds.)
 
 To execute it you should have MsSQL data base and redis which must be specified in appsettings.json or appsettings.Development.json if you are in developer mode.
 
