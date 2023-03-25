@@ -6,6 +6,9 @@ namespace Chat.Hubs;
 public class ChatHub : Hub
 {
     private const string master = "Master";
+    private const string userInRoom = "UserItRoom";
+    private const string receiveMessage = "ReceiveMessage";
+    private const string leaveRoom = "LeaveRoom";
     private readonly IDictionary<string, UserConnection> _connections;
 
     public ChatHub(
@@ -37,7 +40,7 @@ public class ChatHub : Hub
 
             await Clients
                 .Caller
-                .SendAsync("UserItRoom", master, $@"{user.Name} is in {user.Room} chat already");
+                .SendAsync(userInRoom, master, $@"{user.Name} is in {user.Room} chat already");
             return;
         }
 
@@ -47,7 +50,7 @@ public class ChatHub : Hub
 
         await Clients
             .Group(userConnection.Room)
-            .SendAsync("ReceiveMessage", master, $@"{userConnection.Name} has joined");
+            .SendAsync(receiveMessage, master, $@"{userConnection.Name} has joined");
     }
 
     public async Task SendMessage(string message)
@@ -56,7 +59,7 @@ public class ChatHub : Hub
         {
             await Clients
                 .Group(userConnection.Room)
-                .SendAsync("ReceiveMessage", userConnection.Name, message);
+                .SendAsync(receiveMessage, userConnection.Name, message);
         }
     }
 
@@ -65,7 +68,7 @@ public class ChatHub : Hub
         if(_connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection))
         {
             await Clients.Group(userConnection.Room)
-                .SendAsync("LeaveRoom", master, $@"{userConnection.Name} has left ""{userConnection.Room}""");
+                .SendAsync(leaveRoom, master, $@"{userConnection.Name} has left ""{userConnection.Room}""");
 
             await Groups
                 .RemoveFromGroupAsync(Context.ConnectionId, userConnection.Room);

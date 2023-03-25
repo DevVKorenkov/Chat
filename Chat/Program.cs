@@ -99,6 +99,7 @@ services.AddScoped<IUserService, UserService>();
 services.AddScoped<IClanService, ClanService>();
 services.AddScoped<IMessageCacheRepository, MessageCacheRepository>();
 services.AddTransient<IAuthService, AuthService>();
+services.AddTransient<IJwTokenService, JwTokenService>();
 services.AddSingleton<IDictionary<string, UserConnection>>(opt => new Dictionary<string, UserConnection>());
 services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(SettingsManager.AppSettings["RedisConnection"]));
 

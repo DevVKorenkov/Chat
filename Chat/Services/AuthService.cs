@@ -17,15 +17,18 @@ public class AuthService : IAuthService
     private readonly UserManager<AppIdentityUser> _userManager;
     private readonly SignInManager<AppIdentityUser> _signInManager;
     private readonly IUserService _userService;
+    private readonly IJwTokenService _jwTokenService;
 
     public AuthService(
         UserManager<AppIdentityUser> userManager,
         SignInManager<AppIdentityUser> signInManager,
-        IUserService userService)
+        IUserService userService,
+        IJwTokenService jwTokenService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _userService = userService;
+        _jwTokenService = jwTokenService;
     }
 
     public async Task<AuthResponse> Login(LoginModel loginModel)
@@ -45,7 +48,7 @@ public class AuthService : IAuthService
 
         if (loginResult.Succeeded)
         {
-            var jwtToken = await CreateJwtToken(user);
+            var jwtToken = await _jwTokenService.CreateAsync(user);
             return new AuthResponse
             {
                 Response = ResponseStatus.Success,
@@ -107,7 +110,7 @@ public class AuthService : IAuthService
             await _userService.SaveAsync();
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            var jwtToken = await CreateJwtToken(user);
+            var jwtToken = await _jwTokenService.CreateAsync(user);
 
             return new AuthResponse
             {
@@ -125,26 +128,5 @@ public class AuthService : IAuthService
                 Message = registerResult.Errors?.FirstOrDefault()?.Description
             };
         }
-    }
-
-    private async Task<string> CreateJwtToken(AppIdentityUser user)
-    {
-        var claims = new List<Claim>()
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Name, user.UserName),
-        };
-        var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SettingsManager.AppSettings["JWT:Secret"]));
-        var credentials = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-        var tokenOptions = new JwtSecurityToken(
-            issuer: SettingsManager.AppSettings["Jwt:ValidIssuer"],
-            audience: SettingsManager.AppSettings["Jwt:ValidAudience"],
-            claims: claims,
-            expires: DateTime.Now.AddDays(1),
-            signingCredentials: credentials);
-        var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-        var tokenString = jwtSecurityTokenHandler.WriteToken(tokenOptions);
-
-        return tokenString;
     }
 }
